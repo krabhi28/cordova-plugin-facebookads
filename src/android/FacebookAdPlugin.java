@@ -119,7 +119,8 @@ public class FacebookAdPlugin extends GenericAdPlugin {
             result = new PluginResult(Status.OK);
             
     	} else if (ACTION_SET_NATIVEAD_CLICKAREA.equals(action)) {
-            unit.tracking.performClick ();
+            String adid = inputs.optString(0);
+            this.clickonad(adid);
             result = new PluginResult(Status.OK);
             
     	} else {
@@ -276,7 +277,22 @@ public class FacebookAdPlugin extends GenericAdPlugin {
 	    });
     }
     
-    @Override
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public void clickonad(final String adId) {
+        final FlexNativeAd unit = nativeAds.get(adId);
+		if(unit != null) {
+		    final Activity activity = getActivity();
+		    activity.runOnUiThread(new Runnable(){
+	            @Override
+	            public void run() {
+                    if(unit.tracking != null) {
+                   unit.tracking.performClick ();
+                    }
+	            }
+		    });
+		}
+    }
+	@Override
 	public void setOptions(JSONObject options) {
 		super.setOptions(options);
 		
