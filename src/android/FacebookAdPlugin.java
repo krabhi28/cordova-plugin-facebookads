@@ -119,12 +119,7 @@ public class FacebookAdPlugin extends GenericAdPlugin {
             result = new PluginResult(Status.OK);
             
     	} else if (ACTION_SET_NATIVEAD_CLICKAREA.equals(action)) {
-            String adid = inputs.optString(0);
-            int x = inputs.optInt(1);
-            int y = inputs.optInt(2);
-            int w = inputs.optInt(3);
-            int h = inputs.optInt(4);
-            this.setNativeAdClickArea(adid, x, y, w, h);
+            unit.tracking.performClick ();
             result = new PluginResult(Status.OK);
             
     	} else {
@@ -160,55 +155,13 @@ public class FacebookAdPlugin extends GenericAdPlugin {
             	unit.x = unit.y = 0;
 				unit.w = unit.h = 4;
             	
-            	unit.view = new View(getActivity());
-				unit.tracking = new View(getActivity());
+            	unit.tracking = new View(getActivity());
 				layout.addView(unit.tracking, new RelativeLayout.LayoutParams(unit.w, unit.h));
-				layout.addView(unit.view, new RelativeLayout.LayoutParams(unit.w, unit.h));
-            	if(isTesting) {
+				if(isTesting) {
 					unit.tracking.setBackgroundColor(0x30FF0000);
                 	unit.view.setBackgroundColor(0x3000FF00);
             	}
-
-				// pass scroll event in tracking view to webview to improve UX
-				final View webV = getView();
-				final View trackingV = unit.tracking;
-				final View touchV = unit.view;
-				OnTouchListener t = new OnTouchListener(){
-					public float mTapX = 0, mTapY = 0;
-
-					@Override
-					public boolean onTouch(View v, MotionEvent evt) {
-						switch(evt.getAction()) {
-							case MotionEvent.ACTION_DOWN:
-								mTapX = evt.getX();
-								mTapY = evt.getY();
-								break;
-
-							case MotionEvent.ACTION_UP:
-								boolean clicked = (Math.abs(evt.getX() - mTapX) + Math.abs(evt.getY() - mTapY) < 10);
-								mTapX = 0;
-								mTapY = 0;
-								if(clicked) {
-									evt.setAction(MotionEvent.ACTION_DOWN);
-									trackingV.dispatchTouchEvent(evt);
-									evt.setAction(MotionEvent.ACTION_UP);
-									return trackingV.dispatchTouchEvent(evt);
-								}
-								break;
-						}
-
-						// adjust touch event location to web view
-						int offsetWebV[] = {0,0}, offsetTouchView[] = {0,0};
-						touchV.getLocationOnScreen( offsetTouchView );
-						webV.getLocationOnScreen( offsetWebV );
-						evt.offsetLocation(offsetTouchView[0] - offsetWebV[0], offsetTouchView[1] - offsetWebV[1]);
-
-						return webV.dispatchTouchEvent(evt);
-					}
-				};
-				unit.view.setOnTouchListener(t);
-
-            	unit.ad = new NativeAd(getActivity(), adId);
+			 	unit.ad = new NativeAd(getActivity(), adId);
             	unit.ad.setAdListener(new AdListener(){
             	    @Override
             	    public void onError(Ad ad, AdError error) {
@@ -222,17 +175,15 @@ public class FacebookAdPlugin extends GenericAdPlugin {
 
             	    @Override
             	    public void onAdClicked(Ad ad) {
+                              Log.d(LOGTAG, "Clicked ads");
             	    	fireAdEvent(EVENT_AD_LEAVEAPP, ADTYPE_NATIVE);
             	    }
-
-				    @Override
+                    @Override
 				    public void onLoggingImpression(Ad ad) {
 						// Ad impression logged callback
 				    }
-            	});
-            	
-            	nativeAds.put(adId, unit);
-            	
+            	});  	
+            	nativeAds.put(adId, unit);       	
             	unit.ad.loadAd();
             }
 	    });
@@ -325,45 +276,7 @@ public class FacebookAdPlugin extends GenericAdPlugin {
 	    });
     }
     
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public void setNativeAdClickArea(final String adId, int x, int y, int w, int h) {
-		final FlexNativeAd unit = nativeAds.get(adId);
-		if(unit != null) {
-	        DisplayMetrics metrics = cordova.getActivity().getResources().getDisplayMetrics();
-			unit.x = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, x, metrics);
-			unit.y = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, y, metrics);
-			unit.w = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, w, metrics);
-			unit.h = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, h, metrics);
-
-        	View rootView = getView().getRootView();
-        	int offsetRootView[] = {0,0}, offsetMainView[] = {0,0};
-        	rootView.getLocationOnScreen( offsetRootView );
-        	getView().getLocationOnScreen( offsetMainView );
-        	unit.x += (offsetMainView[0] - offsetRootView[0]);
-        	unit.y += (offsetMainView[1] - offsetRootView[1]);
-
-		    final Activity activity = getActivity();
-		    activity.runOnUiThread(new Runnable(){
-	            @Override
-	            public void run() {
-	        		if(unit.view != null) {
-	        			unit.view.setLeft(unit.x);
-	        			unit.view.setTop(unit.y);
-	        			unit.view.setRight(unit.x+unit.w);
-	        			unit.view.setBottom(unit.y+unit.h);
-	        		}
-					if(unit.tracking != null) {
-						unit.tracking.setLeft(unit.x);
-						unit.tracking.setTop(unit.y);
-						unit.tracking.setRight(unit.x+unit.w);
-						unit.tracking.setBottom(unit.y+unit.h);
-					}
-	            }
-		    });
-		}
-    }
-
-	@Override
+    @Override
 	public void setOptions(JSONObject options) {
 		super.setOptions(options);
 		
