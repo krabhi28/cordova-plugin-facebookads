@@ -1,3 +1,4 @@
+cordova.define("cordova-plugin-facebookads.FacebookAds", function(require, exports, module) {
 
 var argscheck = require('cordova/argscheck'),
     exec = require('cordova/exec');
@@ -113,10 +114,12 @@ fbanExport.removeNativeAd = function(adId, successCallback, failureCallback) {
 	cordova.exec( successCallback, failureCallback, 'FacebookAds', 'removeNativeAd', [adId] );
 };
 
-fbanExport.setNativeAdClickArea = function(adId, x, y, w, h, successCallback, failureCallback) {
-	cordova.exec( successCallback, failureCallback, 'FacebookAds', 'setNativeAdClickArea', [adId,x,y,w,h] );
+fbanExport.setNativeAdClickArea = function(adId, successCallback, failureCallback) {
+	cordova.exec( successCallback, failureCallback, 'FacebookAds', 'setNativeAdClickArea', [adId] );
 };
 
 
 module.exports = fbanExport;
 
+
+});
