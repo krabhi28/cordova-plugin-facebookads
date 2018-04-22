@@ -1,5 +1,4 @@
 cordova.define("cordova-plugin-facebookads.FacebookAds", function(require, exports, module) {
-
 var argscheck = require('cordova/argscheck'),
     exec = require('cordova/exec');
 
