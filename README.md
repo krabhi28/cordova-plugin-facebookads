@@ -109,7 +109,7 @@ showInterstitial();
 // for native ad
 createNativeAd(adId, success, fail);
 removeNativeAd(adId);
-setNativeAdClickArea(adId,x,y,w,h);
+setNativeAdClickArea(adId);
 ```
 
 ## Detailed Documentation ##
