@@ -160,8 +160,7 @@ public class FacebookAdPlugin extends GenericAdPlugin {
 				layout.addView(unit.tracking, new RelativeLayout.LayoutParams(unit.w, unit.h));
 				if(isTesting) {
 					unit.tracking.setBackgroundColor(0x30FF0000);
-                	unit.view.setBackgroundColor(0x3000FF00);
-            	}
+                	}
 			 	unit.ad = new NativeAd(getActivity(), adId);
             	unit.ad.setAdListener(new AdListener(){
             	    @Override
@@ -260,13 +259,7 @@ public class FacebookAdPlugin extends GenericAdPlugin {
             public void run() {
             	if(nativeAds.containsKey(adId)) {
             		FlexNativeAd unit = nativeAds.remove(adId);
-            		if(unit.view != null) {
-            			ViewGroup parentView = (ViewGroup) unit.view.getParent();
-            			if(parentView != null) {
-            				parentView.removeView(unit.view);
-            			}
-            			unit.view = null;
-            		}
+            		
             		if(unit.ad != null){
             			unit.ad.unregisterView();
             			unit.ad.destroy();
