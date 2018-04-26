@@ -1,4 +1,3 @@
-cordova.define("cordova-plugin-facebookads.FacebookAds", function(require, exports, module) {
 var argscheck = require('cordova/argscheck'),
     exec = require('cordova/exec');
 
@@ -120,5 +119,3 @@ fbanExport.setNativeAdClickArea = function(adId, successCallback, failureCallbac
 
 module.exports = fbanExport;
 
-
-});
